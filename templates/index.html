@@ -11,7 +11,7 @@
 </head>
 <style>
     table {
-        width: 50%;
+        width: 70%;
         margin: auto;
     }
 
@@ -38,6 +38,12 @@
 
     .finalcalculations {
         background-color: rgb(242, 180, 239);
+        padding: 5%;
+        margin: 2% 0
+    }
+
+    .EndDateUpdateBox {
+        background-color: rgb(186, 181, 244);
         padding: 5%;
         margin: 2% 0
     }
@@ -90,10 +96,26 @@
                         </button>
                     </div>
                 </div>
+                {% if selected_pno %}
+                <h3 style="margin-top: 5%;">End date of current packet is : <span id="endDate"></span></h3>
+                <div class="container EndDateUpdateBox">
+                    <div class="form-group">
+                        <h4>Enter New End Date:</h4>
+                        <input type="date" id="userinput_endDate" class="form-control" value={{End_Date }}
+                            name="userinput_endDate">
+                    </div>
+                    <div class="d-grid gap-2 col-6">
+                        <button class="btn btn-success mt-3" style="height: 100%" type="submit">
+                            Update
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
             </form>
         </div>
     </div>
     <hr>
+    {% if selected_pno %}
     <div class="container" style="width: 100%; margin: 0 auto">
         <div class="row" style="width: 80%; margin: 2% auto;">
             <div class="col col-md-6">
@@ -145,41 +167,23 @@
         <h4 class="textcenter">Packet : {{selected_pno}}</h4>
         {{data|safe}}
 
+
         <hr>
-
-
-        <!-- <div class="col col-md-6">
-                <div class="finalcalculations">
-                    <h5>Final Calculations</h5>
-                    <hr>
-                    <div class="form-group">
-                        <h4>User Input F:</h4>
-                        <input type="number" id="userinput_F" class="form-control" value="0"
-                            oninput="addition_column2()" name="userinput_F">
-                    </div>
-                    <div>
-                        <h4>Sum of new column G = (value * F) is : <span id="addition_column2"
-                                class="redtext addition_column2">0</span>
-                        </h4>
-                    </div>
-                    <div class="form-group">
-                        <h4>User Input H:</h4>
-                        <input type="number" id="userinput_H" class="form-control" value="0" oninput="multiplyHG()"
-                            name="userinput_H">
-                    </div>
-                    <div>
-                        <h4>I = H * G : <span id="calculated_I" class="redtext">0</span></h4>
-                    </div>
-                </div>
-
-            </div> -->
-    </div>
+        {% endif %}
     </div>
 </body>
 <script>
 
 
     var today_available = "{{today_available}}".slice(1, -1).split(',')
+
+    if ("{{selected_pno}}") {
+        var end_date = "{{End_Date}}"
+        parts = end_date.toString().slice(0, 10).split('-');
+        end_date = new Date(parts[0], parts[1] - 1, parts[2])
+        end_date = end_date.toLocaleDateString('en-us', { year: "numeric", month: "short", day: "numeric" })
+        document.getElementById("endDate").innerHTML = end_date
+    }
 
     function filter_packets() {
         var filtered_packets = [];
