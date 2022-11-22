@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Packet Finder</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+        referrerpolicy="no-referrer"></script>
+</head>
+<style>
+    table {
+        width: 50%;
+        margin: auto;
+    }
+
+    th,
+    td {
+        text-align: "center";
+    }
+
+    label {
+        margin: 5% 0;
+    }
+
+    .calculator {
+        background-color: rgb(171, 216, 234);
+        padding: 5%;
+        margin: 2% 0
+    }
+
+    .suggestiopnbox {
+        background-color: rgb(167, 241, 156);
+        padding: 5%;
+        margin: 2% 0
+    }
+
+    .finalcalculations {
+        background-color: rgb(242, 180, 239);
+        padding: 5%;
+        margin: 2% 0
+    }
+
+    .redtext {
+        color: red
+    }
+
+    .textcenter {
+        text-align: center;
+    }
+</style>
+
+<body>
+
+    <div class="row" style="width: auto; margin: 3% 2%">
+        <h3>Search Packet </h3>
+        <div class="col col-md-4">
+            <div class="form-group">
+                <h4>Packet Number:</h4>
+                <input type="text" id="userinput_pno" class="form-control" name="userinput_pno"
+                    oninput="filter_packets()" />
+            </div>
+        </div>
+        <div class="col col-md-2">
+
+        </div>
+        <div class="col col-md-6">
+
+            <form method="POST" action="/" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <h4 id="choosepackettext">Choose Packet</h4>
+                    <select name="packet_list" id="packet_list" class="form-select" aria-label="Default select example"
+                        style="width: 50%">
+                        <option id="default_option" selected hidden>
+                            Choose Packet:
+                        </option>
+                    </select>
+                </div>
+                <div class="row form-group">
+                    <div class="d-grid gap-2 col-6">
+                        <button class="btn btn-success mt-3" style="height: 100%" type="submit">
+                            Get Data
+                        </button>
+                    </div>
+                    <div class="d-grid gap-2 col-6">
+                        <button class="btn btn-warning mt-3" style="height: 100%" type="submit">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <hr>
+    <div class="container" style="width: 100%; margin: 0 auto">
+        <div class="row" style="width: 80%; margin: 2% auto;">
+            <div class="col col-md-6">
+                <div class="calculator">
+                    <h5>Calculator</h5>
+                    <hr>
+                    <div class="form-group">
+                        <h4>User Input A:</h4>
+                        <input type="number" id="userinput_A" class="form-control" value="0" oninput="multiplyAB()"
+                            name="userinput_A">
+                    </div>
+                    <div class="form-group">
+                        <h4>User Input B:</h4>
+                        <input type="number" id="userinput_B" class="form-control" value="0" oninput="multiplyAB()"
+                            name="userinput_B">
+                    </div>
+                    <div>
+                        <h4>C = A * B : </h4>
+                        <input type="number" id="calculated_C" class="form-control" name="calculated_C">
+
+                    </div>
+                </div>
+            </div>
+            <div class="col col-md-6">
+
+                <div class="suggestiopnbox">
+                    <h5>Finding Factor</h5>
+                    <hr>
+                    <div class="form-group">
+                        <h4>Choose Column:</h4>
+                        <select name="userinput_column" id="userinput_column" class="form-select"
+                            oninput="divideDbysum()" aria-label="Default select example" style="width: 50%">
+                            <option id="default_option" selected hidden>
+                                Choose Column:
+                            </option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <h4>User Input D:</h4>
+                        <input type="number" id="userinput_D" class="form-control" value="1500" oninput="divideDbysum()"
+                            name="userinput_D">
+                    </div>
+                    <div>
+                        <h4>Factor E = D / Sum : <span id="calculated_E" class="redtext">0</span></h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <h4 class="textcenter">Packet : {{selected_pno}}</h4>
+        {{data|safe}}
+
+        <hr>
+
+
+        <!-- <div class="col col-md-6">
+                <div class="finalcalculations">
+                    <h5>Final Calculations</h5>
+                    <hr>
+                    <div class="form-group">
+                        <h4>User Input F:</h4>
+                        <input type="number" id="userinput_F" class="form-control" value="0"
+                            oninput="addition_column2()" name="userinput_F">
+                    </div>
+                    <div>
+                        <h4>Sum of new column G = (value * F) is : <span id="addition_column2"
+                                class="redtext addition_column2">0</span>
+                        </h4>
+                    </div>
+                    <div class="form-group">
+                        <h4>User Input H:</h4>
+                        <input type="number" id="userinput_H" class="form-control" value="0" oninput="multiplyHG()"
+                            name="userinput_H">
+                    </div>
+                    <div>
+                        <h4>I = H * G : <span id="calculated_I" class="redtext">0</span></h4>
+                    </div>
+                </div>
+
+            </div> -->
+    </div>
+    </div>
+</body>
+<script>
+
+
+    var today_available = "{{today_available}}".slice(1, -1).split(',')
+
+    function filter_packets() {
+        var filtered_packets = [];
+        let pno = document.getElementById("userinput_pno").value;
+        packet_list = document.getElementById("packet_list");
+        packet_list.innerHTML = "";
+        for (const packet of today_available) {
+            if (pno !== "") {
+                if (
+                    packet
+                        .toString()
+                        .toLowerCase()
+                        .includes(pno.toString().toLowerCase())
+                ) {
+                    filtered_packets.push(packet);
+                }
+            }
+            else {
+                filtered_packets = today_available;
+            }
+        }
+
+
+        options = " <option selected hidden>Choose Packet</option>"
+        filtered_packets.forEach((element) => {
+            var option = `<option value="${element}">${element}</option>`;
+            options = options + option;
+        });
+        packet_list.innerHTML = options;
+
+    }
+
+
+    filter_packets();
+
+
+
+    // ****************Displaying Addition of Column*****************************//
+
+
+
+    // ************************Function to calculate C = A*B *********************//
+
+
+
+    function multiplyAB() {
+        let A = document.getElementById("userinput_A").value
+        let B = document.getElementById("userinput_B").value
+        let C = (A * B).toFixed(3)
+        document.getElementById("calculated_C").value = C
+
+
+    }
+
+    // ************************Function to choose column name ***************//
+
+    let column_names = "{{column_names}}".slice(1, -1).split(',')
+    column_names_list = document.getElementById("userinput_column");
+    column_names_list.innerHTML = "";
+    function chooseColumnName() {
+
+        options = " <option selected hidden>Choose Column</option>"
+        column_names.forEach((element, index) => {
+            var option = `<option value="${index}">${element}</option>`;
+            options = options + option;
+        });
+        column_names_list.innerHTML = options;
+
+    }
+    chooseColumnName();
+    // ************************Function to calculate E = D/sum *********************//
+    table_last_row = $("table tr:last")
+    table_second_last_row = $('table tr:last').prev()
+    var selectedColumn;
+    var factor;
+    function divideDbysum() {
+        oldSelectedColumn = selectedColumn;
+        selectedColumn = document.getElementById("userinput_column").value
+        console.log(oldSelectedColumn, selectedColumn);
+        let D = document.getElementById("userinput_D").value
+        if (oldSelectedColumn && (oldSelectedColumn !== selectedColumn)) {
+            document.getElementById("userinput_D").value = 1500
+        }
+
+        var sum = table_second_last_row.find("td").eq(+selectedColumn * 2 + 1).html();
+        factor = (D / sum).toFixed(2)
+        document.getElementById("calculated_E").innerHTML = factor
+        updating_column()
+    }
+
+
+    // **************Addition and Updating new Columns*****************//
+    let values = JSON.parse('{{datavalues}}');
+    function updating_column() {
+
+        let values2 = values[selectedColumn].slice(0, -1);
+
+        values2 = values2.map(x => x * factor);
+        let sum2 = 0
+
+        for (let e of values2) {
+            sum2 += e;
+        }
+
+        $("table tr:last").find("td").eq(+selectedColumn * 2 + 2).html(factor);
+
+
+        // // finding  td of each tr and updating column values
+
+        //Iterate all td's in second column
+        $(`table tbody tr td:nth-child(${+selectedColumn * 2 + 2 + 1})`).each(function (index) {
+
+            if (index < values2.length) {
+
+                $(this).html(values2[index].toFixed(2))
+            }
+        });
+
+    }
+</script>
+
+</html>
