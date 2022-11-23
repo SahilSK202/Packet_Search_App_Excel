@@ -62,7 +62,7 @@ def Home():
                 if (type(metadata["End_Date"]) == str):
                     metadata["End_Date"] = datetime.strptime(
                         metadata["End_Date"], '%Y-%m-%d')
-                print("End_Date by df", End_Date)
+
                 # Check if date is updated , update the excel sheet
                 if (str(End_Date)[0:10] != new_end_date):
 
@@ -73,23 +73,12 @@ def Home():
                     sheet = workbook.active
 
                     # modify the desired cell
-                    # sheet["B6"] = datetime.strptime(
-                    #     new_end_date, '%Y-%m-%d').strftime("%d-%m-%Y")
+
                     sheet.cell(row=6, column=2).value = new_end_date
 
                     # save the file
                     workbook.save(filename=packet_file_name)
 
-                    #################### LOGIC 2 ##############################
-                    # new_df = pd.read_excel(packet_file_name)
-
-                    # print(new_df['Value'][4])
-                    # new_df['Value'][4] = new_end_date
-                    # print(new_df['Value'][4])
-                    # print(packet_file_name)
-                    # new_df.to_excel(packet_file_name)
-
-                    print(packet_file_name)
                     session.pop('OLD_PNO', None)
 
             else:
@@ -99,6 +88,7 @@ def Home():
                     selected_pno)], header=10).fillna(0)
                 metadata = pd.read_excel(available_packets_files[available_packets.index(
                     selected_pno)], nrows=9, usecols=['Key', 'Value'])
+                # reading metadata of the packet
                 metadata.loc[~(metadata == 0).all(axis=1)]
                 metadata = dict(metadata.fillna(0).values)
                 End_Date = metadata["End_Date"]
@@ -115,7 +105,7 @@ def Home():
                     all_columns.append(col)
                     all_columns.append(col+'_g')
                     new_columns.append(col+'_g')
-                print("here")
+
                 filtered_data = filtered_data[all_columns]
                 # Additon of columns
                 addition = filtered_data[all_columns[1:]].sum(axis=0).T
