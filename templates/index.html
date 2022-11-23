@@ -159,7 +159,9 @@
                             name="userinput_D">
                     </div>
                     <div>
-                        <h4>Factor E = D / Sum : <span id="calculated_E" class="redtext">0</span></h4>
+                        <h4>Factor E = D / Sum : </h4>
+                        <input type="number" id="calculated_E" class="form-control" name="calculated_E"
+                            oninput="update_factor()">
                     </div>
                 </div>
             </div>
@@ -270,7 +272,12 @@
 
         var sum = table_second_last_row.find("td").eq(+selectedColumn * 2 + 1).html();
         factor = (D / sum).toFixed(2)
-        document.getElementById("calculated_E").innerHTML = factor
+        document.getElementById("calculated_E").value = factor
+        updating_column()
+    }
+
+    function update_factor() {
+        factor = document.getElementById("calculated_E").value
         updating_column()
     }
 

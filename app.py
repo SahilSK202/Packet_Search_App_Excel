@@ -7,7 +7,8 @@ import pandas as pd
 from os import path
 import glob
 from openpyxl import load_workbook
-
+from xlrd import open_workbook
+from xlutils.copy import copy
 
 app = Flask(__name__)
 app.secret_key = "123"
@@ -25,10 +26,13 @@ def Home():
     available_packets_files = []
     for file in filenames:
         df = pd.read_excel(file, nrows=9, usecols=[
-            'Key', 'Value'], dtype=object)
+            'Key', 'Value'], )
         df.loc[~(df == 0).all(axis=1)]
         metadata = dict(df.fillna(0).values)
         # Filtering today available data
+        if (type(metadata["End_Date"]) == str):
+            metadata["End_Date"] = datetime.strptime(
+                metadata["End_Date"], '%Y-%m-%d')
 
         if (metadata["End_Date"] > datetime.now()):
             available_packets.append(metadata["PacketNr"])
@@ -40,19 +44,30 @@ def Home():
     if request.method == "POST":
         try:
             selected_pno = str(request.form['packet_list']).strip()
+            # IF form is submitted
             if (selected_pno == 'Choose Packet'):
+
+                packet_file_name = available_packets_files[available_packets.index(
+                    session["OLD_PNO"])]
                 new_end_date = str(request.form['userinput_endDate'])
-                metadata = pd.read_excel(available_packets_files[available_packets.index(
-                    session["OLD_PNO"])], nrows=9, usecols=['Key', 'Value'], dtype=object)
+                if (type(new_end_date) == str):
+                    new_end_date = datetime.strptime(
+                        new_end_date, '%Y-%m-%d')
+                # Get the metadata
+                metadata = pd.read_excel(packet_file_name, nrows=9, usecols=[
+                                         'Key', 'Value'])
                 metadata.loc[~(metadata == 0).all(axis=1)]
                 metadata = dict(metadata.fillna(0).values)
                 End_Date = metadata["End_Date"]
-
+                if (type(metadata["End_Date"]) == str):
+                    metadata["End_Date"] = datetime.strptime(
+                        metadata["End_Date"], '%Y-%m-%d')
+                print("End_Date by df", End_Date)
+                # Check if date is updated , update the excel sheet
                 if (str(End_Date)[0:10] != new_end_date):
 
                     # load excel file
-                    workbook = load_workbook(filename=available_packets_files[available_packets.index(
-                        session["OLD_PNO"])])
+                    workbook = load_workbook(packet_file_name)
 
                     # open workbook
                     sheet = workbook.active
@@ -60,23 +75,36 @@ def Home():
                     # modify the desired cell
                     # sheet["B6"] = datetime.strptime(
                     #     new_end_date, '%Y-%m-%d').strftime("%d-%m-%Y")
-                    sheet.cell(row=6, column=2).value = datetime.strptime(
-                        new_end_date, '%Y-%m-%d').strftime("%d-%m-%Y")
+                    sheet.cell(row=6, column=2).value = new_end_date
 
                     # save the file
-                    workbook.save(filename=available_packets_files[available_packets.index(
-                        session["OLD_PNO"])])
+                    workbook.save(filename=packet_file_name)
+
+                    #################### LOGIC 2 ##############################
+                    # new_df = pd.read_excel(packet_file_name)
+
+                    # print(new_df['Value'][4])
+                    # new_df['Value'][4] = new_end_date
+                    # print(new_df['Value'][4])
+                    # print(packet_file_name)
+                    # new_df.to_excel(packet_file_name)
+
+                    print(packet_file_name)
                     session.pop('OLD_PNO', None)
+
             else:
                 session["OLD_PNO"] = selected_pno
 
                 filtered_data = pd.read_excel(available_packets_files[available_packets.index(
-                    selected_pno)], header=10, dtype=object).fillna(0)
+                    selected_pno)], header=10).fillna(0)
                 metadata = pd.read_excel(available_packets_files[available_packets.index(
-                    selected_pno)], nrows=9, usecols=['Key', 'Value'], dtype=object)
+                    selected_pno)], nrows=9, usecols=['Key', 'Value'])
                 metadata.loc[~(metadata == 0).all(axis=1)]
                 metadata = dict(metadata.fillna(0).values)
                 End_Date = metadata["End_Date"]
+                if (type(metadata["End_Date"]) == str):
+                    metadata["End_Date"] = datetime.strptime(
+                        metadata["End_Date"], '%Y-%m-%d')
                 all_columns = ['Chemicals']
                 new_columns = []
 
@@ -87,7 +115,7 @@ def Home():
                     all_columns.append(col)
                     all_columns.append(col+'_g')
                     new_columns.append(col+'_g')
-
+                print("here")
                 filtered_data = filtered_data[all_columns]
                 # Additon of columns
                 addition = filtered_data[all_columns[1:]].sum(axis=0).T
