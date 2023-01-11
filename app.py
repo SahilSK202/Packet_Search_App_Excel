@@ -112,8 +112,16 @@ def Home():
                 filtered_data.loc[len(filtered_data.index)] = [
                     'Sum', *addition.values]
 
+                # # Setting default value for Factor
+                default_factor_list = [1500/[*addition.values][i-1] if i % 2 != 0 else 0 for i in range(
+                    len(filtered_data.columns)-1)]
+                # print(len(filtered_data.columns)-1, default_factor_list)
+
                 filtered_data.loc[len(filtered_data.index)] = [
-                    'Factor'] + np.zeros(len(filtered_data.columns) - 1).tolist()
+                    'Factor'] + default_factor_list
+
+                # filtered_data.loc[len(filtered_data.index)] = [
+                #     'Factor'] + np.zeros(len(filtered_data.columns) - 1).tolist()
 
                 # Collecting new column values to pass on frontend
                 datavalues = np.transpose(
